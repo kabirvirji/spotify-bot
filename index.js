@@ -15,9 +15,9 @@ async function listenFacebook(err, message) {
     const songToSearch = body.match(/play(.+)/)[1].trim();
     const searchResults = await spotifyApi.searchTracks(songToSearch);
     const songToPlay = searchResults.body.tracks.items[0].album.name;
+    cmd.run(`spotify play ${songToPlay}`);
   }
   
-  // cmd.run(`spotify play ${songToPlay}`);
     // api.sendMessage(message.body, message.threadID);
 }
 
