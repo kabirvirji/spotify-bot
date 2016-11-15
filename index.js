@@ -10,9 +10,14 @@ let api;
 
 async function listenFacebook(err, message) {
   // cmd.run(message.body);
-  const searchResults = await spotifyApi.searchTracks(message.body);
-  const songToPlay = searchResults.body.tracks.items[0].album.name;
-  cmd.run(`spotify play ${songToPlay}`);
+  const { body } = message;
+  if (body.indexOf('play') > -1) {
+    const songToSearch = body.match(/play(.+)/)[1].trim();
+    const searchResults = await spotifyApi.searchTracks(songToSearch);
+    const songToPlay = searchResults.body.tracks.items[0].album.name;
+  }
+  
+  // cmd.run(`spotify play ${songToPlay}`);
     // api.sendMessage(message.body, message.threadID);
 }
 
