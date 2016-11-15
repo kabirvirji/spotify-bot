@@ -1,0 +1,33 @@
+const login = require('facebook-chat-api');
+const config = require('./config.json');
+const cmd = require('node-cmd');
+const SpotifyWebApi = require('spotify-web-api-node');
+const spotifyApi = new SpotifyWebApi({
+  clientId : config.spotifyid,
+  clientSecret : config.spotifysecret
+});
+let api;
+
+async function listenFacebook(err, message) {
+  // cmd.run(message.body);
+  const searchResults = await spotifyApi.searchTracks(message.body);
+  const songToPlay = searchResults.body.tracks.items[0].album.name;
+  cmd.run(`spotify play ${songToPlay}`);
+    // api.sendMessage(message.body, message.threadID);
+}
+
+async function init() {
+  api = await loginToFacebook();
+  api.listen(listenFacebook);
+}
+
+function loginToFacebook() {
+  return new Promise((resolve, reject) => {
+    login({ email: config.login, password: config.password }, (err, api) => {
+      if (err) reject(err);
+      resolve(api);
+    })
+  });
+}
+
+init();
