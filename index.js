@@ -9,23 +9,43 @@ const spotifyApi = new SpotifyWebApi({
 });
 let api;
 
+function prettyConsole(data) {
+  console.log(prettyjson.render(data));
+}
+
+async function checkThreadPlaylist(threadID) {
+  const playlists = await spotifyApi.getUserPlaylists(config.spotifyUsername);
+  prettyConsole(playlists);
+}
+
+async function getUser(username) {
+  prettyConsole(await spotifyApi.getUser(username));
+}
+
 async function listenFacebook(err, message) {
+  checkThreadPlaylist(message.threadID);
+  
   // cmd.run(message.body);
   const { body } = message;
   if (body.indexOf('play') > -1) {
     const songToSearch = body.match(/play(.+)/)[1].trim();
     const searchResults = await spotifyApi.searchTracks(songToSearch);
-    console.log(prettyjson.render(searchResults));
+    // console.log(prettyjson.render(searchResults));
     const songToPlay = searchResults.body.tracks.items[0].name;
     cmd.run(`spotify play ${songToPlay}`);
-  }
-  
-    // api.sendMessage(message.body, message.threadID);
+  } // api.sendMessage(message.body, message.threadID);
 }
 
 async function init() {
+  await initSpotify();
+  // await getUser(config.spotifyUsername);
   api = await loginToFacebook();
   api.listen(listenFacebook);
+}
+
+async function initSpotify() {
+  const { body } = await spotifyApi.clientCredentialsGrant();
+  spotifyApi.setAccessToken(body['access_token']);
 }
 
 function loginToFacebook() {
