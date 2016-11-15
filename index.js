@@ -1,4 +1,5 @@
 const login = require('facebook-chat-api');
+const prettyjson = require('prettyjson');
 const config = require('./config.json');
 const cmd = require('node-cmd');
 const SpotifyWebApi = require('spotify-web-api-node');
@@ -14,7 +15,7 @@ async function listenFacebook(err, message) {
   if (body.indexOf('play') > -1) {
     const songToSearch = body.match(/play(.+)/)[1].trim();
     const searchResults = await spotifyApi.searchTracks(songToSearch);
-    console.log(searchResults);
+    console.log(prettyjson.render(searchResults));
     const songToPlay = searchResults.body.tracks.items[0].name;
     cmd.run(`spotify play ${songToPlay}`);
   }
