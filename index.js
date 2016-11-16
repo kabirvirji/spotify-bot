@@ -1,10 +1,3 @@
-// add playlist: spotify play list <playlistname>
-// add specific URI: spotify play URI <URI> 
-
-// Playlist link looks like https://open.spotify.com/user/kabirvirji/playlist/0RZpojvYE6DPHfMK6mmbwH
-// need to copy the last part and input as
-// spotify play uri spotify:user:kabirvirji:playlist:0RZpojvYE6DPHfMK6mmbwH
-
 const login = require('facebook-chat-api');
 const prettyjson = require('prettyjson');
 const config = require('./config.json');
@@ -19,6 +12,19 @@ let api;
 function prettyConsole(data) {
   console.log(prettyjson.render(data));
 }
+
+// Trying to get an intro message at beginning of conversation, or when it is added to a group
+
+// login({email: "", password: ""}, function callback (err, api) {
+//     if(err) return console.error(err);
+
+//     var yourID = "100014215535982";
+//     var msg = {body: "Hey!"};
+//     api.sendMessage(msg, yourID);
+//     console.log(msg);
+// });
+
+// For creating playlists for groups
 
 // async function checkThreadPlaylist(threadID) {
 //   const playlists = await spotifyApi.getUserPlaylists(config.spotifyUsername);
@@ -35,30 +41,27 @@ async function listenFacebook(err, message) {
   // cmd.run(message.body);
   const { body } = message;
 
-  // trying to play a playlist
-
-  // if (body.indexOf('list') != -1) { // the word list is in the command, we can expect a playlist
-
-  //   const playlistToSearch = body.slice(9); // play list <playlist name>, indexs just the playlist name
-  //   cmd.run(`spotify play ${playlistToSearch}`);
-
-  // }
-
   if (body.indexOf('play song') > -1) { // has the word play
-    const songToSearch = body.match(/play(.+)/)[1].trim();
+    //const songToSearch = body.match(/play(.+)/)[1].trim();
+    const songToSearch = body.split("song ")[1];
+    console.log(`song to search: ${songToSearch}`);
     const searchResults = await spotifyApi.searchTracks(songToSearch);
-    // console.log(prettyjson.render(searchResults));
     const songToPlay = searchResults.body.tracks.items[0].name;
+    console.log(`song to play: ${songToPlay}`);
     cmd.run(`spotify play ${songToPlay}`);
   } // api.sendMessage(message.body, message.threadID);
 
-  if (body.indexOf('https://open.spotify.com/user') > -1 ) { // is a spotify playlist link
+  else if (body.indexOf('https://open.spotify.com/user') > -1 ) { // is a spotify playlist link
 
     const playlistIdentifier = body.split("playlist/")[1]; // grabs the unique playlist identifier
-
+    console.log(`playing spotify:user:kabirvirji:playlist:${playlistIdentifier}`);
     cmd.run(`spotify play uri spotify:user:kabirvirji:playlist:${playlistIdentifier}`);
 
   } 
+
+  else if (body.indexOf('next') > -1) {
+    cmd.run(`spotify next`);
+  }
 
 
 }
