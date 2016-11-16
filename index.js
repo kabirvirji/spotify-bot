@@ -28,20 +28,22 @@ async function listenFacebook(err, message) {
   // cmd.run(message.body);
   const { body } = message;
 
-  if (body.indexOf('list') != -1) { // the word list is in the command, we can expect a playlist
+  // trying to play a playlist
 
-    const playlistToSearch = body.slice(9); // play list <playlist name>, indexs just the playlist name
-    cmd.run(`spotify play ${playlistToSearch}`);
+  // if (body.indexOf('list') != -1) { // the word list is in the command, we can expect a playlist
 
-  }
-  
-  // if (body.indexOf('play') > -1) {
-  //   const songToSearch = body.match(/play(.+)/)[1].trim();
-  //   const searchResults = await spotifyApi.searchTracks(songToSearch);
-  //   // console.log(prettyjson.render(searchResults));
-  //   const songToPlay = searchResults.body.tracks.items[0].name;
-  //   cmd.run(`spotify play ${songToPlay}`);
-  // } // api.sendMessage(message.body, message.threadID);
+  //   const playlistToSearch = body.slice(9); // play list <playlist name>, indexs just the playlist name
+  //   cmd.run(`spotify play ${playlistToSearch}`);
+
+  // }
+
+  if (body.indexOf('play') > -1) {
+    const songToSearch = body.match(/play(.+)/)[1].trim();
+    const searchResults = await spotifyApi.searchTracks(songToSearch);
+    // console.log(prettyjson.render(searchResults));
+    const songToPlay = searchResults.body.tracks.items[0].name;
+    cmd.run(`spotify play ${songToPlay}`);
+  } // api.sendMessage(message.body, message.threadID);
 
 
 }
