@@ -1,3 +1,10 @@
+// add playlist: spotify play list <playlistname>
+// add specific URI: spotify play URI <URI> 
+
+// Playlist link looks like https://open.spotify.com/user/kabirvirji/playlist/0RZpojvYE6DPHfMK6mmbwH
+// need to copy the last part and input as
+// spotify play uri spotify:user:kabirvirji:playlist:0RZpojvYE6DPHfMK6mmbwH
+
 const login = require('facebook-chat-api');
 const prettyjson = require('prettyjson');
 const config = require('./config.json');
@@ -23,7 +30,7 @@ function prettyConsole(data) {
 // }
 
 async function listenFacebook(err, message) {
-  checkThreadPlaylist(message.threadID);
+  //checkThreadPlaylist(message.threadID);
   
   // cmd.run(message.body);
   const { body } = message;
@@ -37,13 +44,21 @@ async function listenFacebook(err, message) {
 
   // }
 
-  if (body.indexOf('play') > -1) {
+  if (body.indexOf('play song') > -1) { // has the word play
     const songToSearch = body.match(/play(.+)/)[1].trim();
     const searchResults = await spotifyApi.searchTracks(songToSearch);
     // console.log(prettyjson.render(searchResults));
     const songToPlay = searchResults.body.tracks.items[0].name;
     cmd.run(`spotify play ${songToPlay}`);
   } // api.sendMessage(message.body, message.threadID);
+
+  if (body.indexOf('https://open.spotify.com/user') > -1 ) { // is a spotify playlist link
+
+    const playlistIdentifier = body.split("playlist/")[1]; // grabs the unique playlist identifier
+
+    cmd.run(`spotify play uri spotify:user:kabirvirji:playlist:${playlistIdentifier}`);
+
+  } 
 
 
 }
