@@ -64,9 +64,9 @@ async function listenFacebook(err, message) {
 
   else if (body.indexOf('queue') > -1) { // has the word queue
 
-    const songToSearchforQueue = body.split("queue ")[1];
-    const searchResultsforQueue = await spotifyApi.searchTracks(songToSearchforQueue);
-    const songToQueue = searchResultsforQueue.body.tracks.items[0].uri;
+    const songToSearchforQueue = body.split("queue ")[1]; // takes just the song name eg. "queue songname" will just take songname
+    const searchResultsforQueue = await spotifyApi.searchTracks(songToSearchforQueue); // search results like before
+    const songToQueue = searchResultsforQueue.body.tracks.items[0].uri; // index at URI instread of name like before
     queue_array.push(songToQueue);
 
   }
@@ -76,7 +76,7 @@ async function listenFacebook(err, message) {
   }
 
   for (i = 0; i < queue_array.length; i++) { 
-    cmd.run('spotify play ' + queue_array[i]);
+    cmd.run('spotify play uri ' + queue_array[i]);
   }
 
 
