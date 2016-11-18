@@ -76,6 +76,7 @@ async function listenFacebook(err, message) {
   }
 
   for (i = 0; i < queue_array.length; i++) { 
+    // need something to figure out if a song is done or not. queue <songname> plays the song right away 
     cmd.run('spotify play uri ' + queue_array[i]);
   }
 
