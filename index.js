@@ -82,13 +82,16 @@ async function listenFacebook(err, message) {
       function(data) {
         var position = data.split("Position: ")[1];
         // now we have just: 3:46 / 3:46
-        var positionArray = position.split(' / '); // positionArray is not defined ?????
+        var positionArray = position.split(' / '); // positionArray or position is not defined ?????
         // [ '3:46', '3:46' ] when song time is up
       }
     );
 
-    if (positionArray[0] == positionArray[1]) {
-      cmd.run('spotify play uri ' + queue_array[i]);
+    if (typeof positionArray !== 'undefined') {
+      if (positionArray[0] == positionArray[1]) {
+        // if the two elements in the array match each other then the song is finished
+        cmd.run('spotify play uri ' + queue_array[i]);
+      }
     }
     
   }
