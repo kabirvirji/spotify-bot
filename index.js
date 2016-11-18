@@ -80,18 +80,17 @@ async function listenFacebook(err, message) {
     cmd.get(
       'spotify status',
       function(data) {
-        console.log('this is the spotify status: ' + data)
-        console.log(typeof data); // data is a string
-        // need to slice string and check if song is complete
-        // a complete song will look like this: Position: 3:46 / 3:46
-        // get just the 3:46 / 3:46 part
-        var songTimeStatus = body.split("Position: ")[1];
+        var position = data.split("Position: ")[1];
         // now we have just: 3:46 / 3:46
-
+        var positionArray = position.split(' / '); // positionArray is not defined ?????
+        // [ '3:46', '3:46' ] when song time is up
       }
     );
 
-    cmd.run('spotify play uri ' + queue_array[i]);
+    if (positionArray[0] == positionArray[1]) {
+      cmd.run('spotify play uri ' + queue_array[i]);
+    }
+    
   }
 
   // cmd.get('spotify status') to get position of song ie) Position: 0:17 / 2:30 (check docs for the cmd function)
