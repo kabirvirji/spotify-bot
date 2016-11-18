@@ -37,6 +37,8 @@ function prettyConsole(data) {
 
 async function listenFacebook(err, message) {
   //checkThreadPlaylist(message.threadID);
+
+  var queue_array = [];
   
   // cmd.run(message.body);
   const { body } = message;
@@ -48,6 +50,7 @@ async function listenFacebook(err, message) {
     const searchResults = await spotifyApi.searchTracks(songToSearch);
     const songToPlay = searchResults.body.tracks.items[0].name;
     console.log(`song to play: ${songToPlay}`);
+    console.log(searchResults.body.tracks);
     cmd.run(`spotify play ${songToPlay}`);
   } // api.sendMessage(message.body, message.threadID);
 
@@ -57,10 +60,23 @@ async function listenFacebook(err, message) {
     console.log(`playing spotify:user:kabirvirji:playlist:${playlistIdentifier}`);
     cmd.run(`spotify play uri spotify:user:kabirvirji:playlist:${playlistIdentifier}`);
 
-  } 
+  }
+
+  else if (body.indexOf('queue') > -1) { // has the word queue
+
+    const songToSearchforQueue = body.split("queue ")[1];
+    const searchResultsforQueue = await spotifyApi.searchTracks(songToSearchforQueue);
+    const songToQueue = searchResultsforQueue.body.tracks.items[0].uri;
+    queue_array.push(songToQueue);
+
+  }
 
   else if (body.indexOf('next') > -1) {
     cmd.run(`spotify next`);
+  }
+
+  for (i = 0; i < queue_array.length; i++) { 
+    cmd.run('spotify play ' + queue_array[i]);
   }
 
 
