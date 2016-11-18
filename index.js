@@ -77,12 +77,28 @@ async function listenFacebook(err, message) {
 
   for (i = 0; i < queue_array.length; i++) { 
     // need something to figure out if a song is done or not. queue <songname> plays the song right away 
+    cmd.get(
+      'spotify status',
+      function(data) {
+        console.log('this is the spotify status: ' + data)
+        console.log(typeof data); // data is a string
+        // need to slice string and check if song is complete
+        // a complete song will look like this: Position: 3:46 / 3:46
+        // get just the 3:46 / 3:46 part
+        var songTimeStatus = body.split("Position: ")[1];
+        // now we have just: 3:46 / 3:46
+
+      }
+    );
+
     cmd.run('spotify play uri ' + queue_array[i]);
   }
 
   // cmd.get('spotify status') to get position of song ie) Position: 0:17 / 2:30 (check docs for the cmd function)
   // turn that into a percentage, or something to make sure the song is complete
   // THEN play the next song in the array
+
+  // could also just get the time from spotify status and compare with the time from the search results (which is in ms, will need to convert)
 
 
 }
