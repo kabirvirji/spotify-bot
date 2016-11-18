@@ -80,6 +80,10 @@ async function listenFacebook(err, message) {
     cmd.run('spotify play uri ' + queue_array[i]);
   }
 
+  // cmd.get('spotify status') to get position of song ie) Position: 0:17 / 2:30 (check docs for the cmd function)
+  // turn that into a percentage, or something to make sure the song is complete
+  // THEN play the next song in the array
+
 
 }
 
