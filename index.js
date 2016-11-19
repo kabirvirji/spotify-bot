@@ -86,20 +86,28 @@ setInterval(function() {
       if (typeof position !== 'undefined') {
         var positionArray = position.split(' / '); // positionArray or position is not defined ?????
         // [ '3:46', '3:46' ] when song time is up
-        var time = positionArray[1];
-        var new_time = time.replace("\n", "");
-        console.log(`Time of song: ${positionArray[0]} ${new_time}`);
+        var time = positionArray[1]; // second element in array
+        var new_time_two = time.replace("\n", ""); // get rid of the newline character
+        var new_time_two_two = new_time_two.replace(":", "."); // convert the time 3:46 to 3.46
+        var time_zero = positionArray[0]; // first element in array
+        var new_time_one = time_zero.replace(":", "."); // convert to str float
+        var finalOne = Number(new_time_one);
+        var finalTwo = Number(new_time_two_two);
+        var finalOnetoCompare = finalOne + 0.01;
+        console.log(`Time of song: ${finalOne} ${finalTwo}`);
       }
     } 
   )
 
-if (typeof positionArray !== 'undefined' && typeof position === 'undefined') {
-  //if (positionArray[0] == new_time) {
-    // if the two elements in the array match each other then the song is finished
-    cmd.run('spotify play uri ' + queue_array[0]); // play the first song in the array
-    queue_array.shift(); // remove first element in array
-  //}
-}
+  if (typeof finalOne !== 'undefined' && typeof finalTwo !== 'undefined') {
+    if (finalOne == finalTwo) {
+      //if (positionArray[0] == new_time) {
+        // if the two elements in the array match each other then the song is finished
+        cmd.run('spotify play uri ' + queue_array[0]); // play the first song in the array
+        queue_array.shift(); // remove first element in array
+      //}
+    }
+  }
 
 }, 
 1000);

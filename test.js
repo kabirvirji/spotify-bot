@@ -1,4 +1,15 @@
-var position = '3:46 / 3:46';
-var x = position.split(' / ');
-console.log(x[0] == x[1]);
-console.log(x);
+const cmd = require('node-cmd');
+
+setInterval(function() {
+
+  cmd.get(
+    'spotify status',
+    function(data) {
+      //var position = data.split("Position: ")[1];
+      //console.log(position);
+      console.log(data);
+      }
+  )
+
+}, 
+1000);
