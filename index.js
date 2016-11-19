@@ -75,9 +75,7 @@ async function listenFacebook(err, message) {
   }
 
 
-setTimeout(function() {
-
-  console.log('checking');
+setInterval(function() {
 
   cmd.get(
     'spotify status',
@@ -86,15 +84,19 @@ setTimeout(function() {
       // now we have just: 3:46 / 3:46
       var positionArray = position.split(' / '); // positionArray or position is not defined ?????
       // [ '3:46', '3:46' ] when song time is up
-    }
+      var time = positionArray[1];
+      var new_time = time.replace("\n", "");
+      console.log(`Time of song: ${positionArray[0]} ${new_time}`);
+    } 
   )
 
-  if (positionArray[0] == positionArray[1]) {
+if (typeof positionArray !== 'undefined') {
+  if (positionArray[0] == new_time) {
     // if the two elements in the array match each other then the song is finished
     cmd.run('spotify play uri ' + queue_array[0]); // play the first song in the array
     queue_array.shift(); // remove first element in array
   }
-
+}
 
 }, 
 1000);
