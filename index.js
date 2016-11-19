@@ -46,12 +46,11 @@ async function listenFacebook(err, message) {
   if (body.indexOf('play song') > -1) { // has the word play
     //const songToSearch = body.match(/play(.+)/)[1].trim();
     const songToSearch = body.split("song ")[1];
-    console.log(`song to search: ${songToSearch}`);
+    console.log(`Song to search: ${songToSearch}`);
     const searchResults = await spotifyApi.searchTracks(songToSearch);
-    const songToPlay = searchResults.body.tracks.items[0].name;
-    console.log(`song to play: ${songToPlay}`);
-    console.log(searchResults.body.tracks);
-    cmd.run(`spotify play ${songToPlay}`);
+    const songToPlay = searchResults.body.tracks.items[0].uri;
+    console.log(`Song to play: ${songToPlay}`);
+    cmd.run(`spotify play uri ${songToPlay}`);
   } // api.sendMessage(message.body, message.threadID);
 
   else if (body.indexOf('https://open.spotify.com/user') > -1 ) { // is a spotify playlist link
@@ -75,26 +74,30 @@ async function listenFacebook(err, message) {
     cmd.run(`spotify next`);
   }
 
-  for (i = 0; i < queue_array.length; i++) { 
-    // need something to figure out if a song is done or not. queue <songname> plays the song right away 
-    cmd.get(
-      'spotify status',
-      function(data) {
-        var position = data.split("Position: ")[1];
-        // now we have just: 3:46 / 3:46
-        var positionArray = position.split(' / '); // positionArray or position is not defined ?????
-        // [ '3:46', '3:46' ] when song time is up
-      }
-    );
 
-    if (typeof positionArray !== 'undefined') {
-      if (positionArray[0] == positionArray[1]) {
-        // if the two elements in the array match each other then the song is finished
-        cmd.run('spotify play uri ' + queue_array[i]);
-      }
+setTimeout(function() {
+
+  console.log('checking');
+
+  cmd.get(
+    'spotify status',
+    function(data) {
+      var position = data.split("Position: ")[1];
+      // now we have just: 3:46 / 3:46
+      var positionArray = position.split(' / '); // positionArray or position is not defined ?????
+      // [ '3:46', '3:46' ] when song time is up
     }
-    
+  )
+
+  if (positionArray[0] == positionArray[1]) {
+    // if the two elements in the array match each other then the song is finished
+    cmd.run('spotify play uri ' + queue_array[0]); // play the first song in the array
+    queue_array.shift(); // remove first element in array
   }
+
+
+}, 
+1000);
 
   // cmd.get('spotify status') to get position of song ie) Position: 0:17 / 2:30 (check docs for the cmd function)
   // turn that into a percentage, or something to make sure the song is complete
