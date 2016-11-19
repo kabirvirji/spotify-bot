@@ -70,7 +70,7 @@ async function listenFacebook(err, message) {
 
   }
 
-  else if (body.indexOf('next') > -1) {
+  else if (body.indexOf('next') > -1) { // plays the next song
     cmd.run(`spotify next`);
   }
 
@@ -81,21 +81,24 @@ setInterval(function() {
     'spotify status',
     function(data) {
       var position = data.split("Position: ")[1];
+      console.log(position);
       // now we have just: 3:46 / 3:46
-      var positionArray = position.split(' / '); // positionArray or position is not defined ?????
-      // [ '3:46', '3:46' ] when song time is up
-      var time = positionArray[1];
-      var new_time = time.replace("\n", "");
-      console.log(`Time of song: ${positionArray[0]} ${new_time}`);
+      if (typeof position !== 'undefined') {
+        var positionArray = position.split(' / '); // positionArray or position is not defined ?????
+        // [ '3:46', '3:46' ] when song time is up
+        var time = positionArray[1];
+        var new_time = time.replace("\n", "");
+        console.log(`Time of song: ${positionArray[0]} ${new_time}`);
+      }
     } 
   )
 
-if (typeof positionArray !== 'undefined') {
-  if (positionArray[0] == new_time) {
+if (typeof positionArray !== 'undefined' && typeof position === 'undefined') {
+  //if (positionArray[0] == new_time) {
     // if the two elements in the array match each other then the song is finished
     cmd.run('spotify play uri ' + queue_array[0]); // play the first song in the array
     queue_array.shift(); // remove first element in array
-  }
+  //}
 }
 
 }, 
