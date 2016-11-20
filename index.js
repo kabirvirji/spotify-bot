@@ -106,6 +106,12 @@ setInterval(function() {
         queue_array.shift(); // remove first element in array
       }
 
+      // *****
+      // looks like position is undefined when the song is paused. when the song is paused the shell looks like this:
+      // ~ spotify status
+      // Spotify is currently paused.
+      // wrote an else if to deal with if that is the response from 'spotify status'
+
 
         if ((finalOne+0.01) == finalTwo) {
           //if (positionArray[0] == new_time) {
