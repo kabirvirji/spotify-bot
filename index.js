@@ -50,6 +50,7 @@ async function listenFacebook(err, message) {
     const searchResults = await spotifyApi.searchTracks(songToSearch);
     const songToPlay = searchResults.body.tracks.items[0].uri;
     console.log(`Song to play: ${songToPlay}`);
+    console.log(searchResults.body.tracks.items[0]);
     cmd.run(`spotify play uri ${songToPlay}`);
   } // api.sendMessage(message.body, message.threadID);
 
@@ -66,6 +67,8 @@ async function listenFacebook(err, message) {
     const songToSearchforQueue = body.split("queue ")[1]; // takes just the song name eg. "queue songname" will just take songname
     const searchResultsforQueue = await spotifyApi.searchTracks(songToSearchforQueue); // search results like before
     const songToQueue = searchResultsforQueue.body.tracks.items[0].uri; // index at URI instread of name like before
+    console.log(searchResultsforQueue);
+    //const songToQueue = searchResultsforQueue.body.tracks.items[0].uri;
     queue_array.push(songToQueue);
 
   }
@@ -80,7 +83,9 @@ setInterval(function() {
   cmd.get(
     'spotify status',
     function(data) {
+      var x = 5;
       var position = data.split("Position: ")[1];
+      var position_two = data;
       console.log(position);
       // now we have just: 3:46 / 3:46
       if (typeof position !== 'undefined') {
@@ -96,18 +101,22 @@ setInterval(function() {
         var finalOnetoCompare = finalOne + 0.01;
         console.log(`Time of song: ${finalOne} ${finalTwo}`);
       }
-    } 
-  )
-
-  if (typeof finalOne !== 'undefined' && typeof finalTwo !== 'undefined') {
-    if (finalOne == finalTwo) {
-      //if (positionArray[0] == new_time) {
-        // if the two elements in the array match each other then the song is finished
+      else if (typeof position_two !== 'undefined') { // spotify is paued, so play the next song
         cmd.run('spotify play uri ' + queue_array[0]); // play the first song in the array
         queue_array.shift(); // remove first element in array
-      //}
-    }
-  }
+      }
+
+
+        if ((finalOne+0.01) == finalTwo) {
+          //if (positionArray[0] == new_time) {
+            // if the two elements in the array match each other then the song is finished
+            cmd.run('spotify play uri ' + queue_array[0]); // play the first song in the array
+            queue_array.shift(); // remove first element in array
+          //}
+        }
+      }
+  )
+
 
 }, 
 1000);
@@ -117,6 +126,14 @@ setInterval(function() {
   // THEN play the next song in the array
 
   // could also just get the time from spotify status and compare with the time from the search results (which is in ms, will need to convert)
+  // the following converts ms to minute:second format
+  // var ms = 171373,
+  //    min = (ms/1000/60) << 0,
+  //    sec = ((ms/1000) % 60).toFixed(0);
+
+
+  // alert(min + ':' + sec);
+  // the call to get ms of the song is searchResults.body.tracks.items[0].duration_ms;
 
 
 }
