@@ -145,6 +145,11 @@ async function listenFacebook(err, message) {
     cmd.run(`spotify pause`);
   }
 
+  else if (body.indexOf('play') > -1) { // plays the next song
+    clearInterval(myInterval);
+    cmd.run(`spotify play`);
+  }
+
 
 
 
