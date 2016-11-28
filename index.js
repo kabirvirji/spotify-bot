@@ -35,57 +35,14 @@ function prettyConsole(data) {
 //   prettyConsole(await spotifyApi.getUser(username));
 // }
 var queue_array = [];
-async function listenFacebook(err, message) {
-  //checkThreadPlaylist(message.threadID);
 
-  
-  
-  // cmd.run(message.body);
-  const { body } = message;
-
-  if (body.indexOf('play song') > -1) { // has the word play
-    //const songToSearch = body.match(/play(.+)/)[1].trim();
-    const songToSearch = body.split("song ")[1];
-    console.log(`Song to search: ${songToSearch}`);
-    const searchResults = await spotifyApi.searchTracks(songToSearch);
-    const songToPlay = searchResults.body.tracks.items[0].uri;
-    console.log(`Song to play: ${songToPlay}`);
-    console.log(searchResults.body.tracks.items[0]);
-    cmd.run(`spotify play uri ${songToPlay}`);
-  } // api.sendMessage(message.body, message.threadID);
-
-  else if (body.indexOf('https://open.spotify.com/user') > -1 ) { // is a spotify playlist link
-
-    const playlistIdentifier = body.split("playlist/")[1]; // grabs the unique playlist identifier
-    console.log(`playing spotify:user:kabirvirji:playlist:${playlistIdentifier}`);
-    cmd.run(`spotify play uri spotify:user:kabirvirji:playlist:${playlistIdentifier}`);
-
-  }
-
-  else if (body.indexOf('queue') > -1) { // has the word queue
-
-    const songToSearchforQueue = body.split("queue ")[1]; // takes just the song name eg. "queue songname" will just take songname
-    const searchResultsforQueue = await spotifyApi.searchTracks(songToSearchforQueue); // search results like before
-    const songToQueue = searchResultsforQueue.body.tracks.items[0].uri; // index at URI instread of name like before
-    
-    //const songToQueue = searchResultsforQueue.body.tracks.items[0].uri;
-    queue_array.push(songToQueue);
-    console.log(queue_array);
-
-  }
-
-  else if (body.indexOf('next') > -1) { // plays the next song
-    cmd.run(`spotify next`);
-  }
-
-
-setInterval(function() {
+var myInterval = setInterval(function() {
 
   cmd.get(
     'spotify status',
     function(data) {
       console.log(data);
-      console.log(data.includes('paused'));
+      console.log(data.includes('paused')); // bool
       if (data.includes('paused')) {
         console.log(`The song is paused, so I'll play: ${queue_array}`);
         cmd.run('spotify play uri ' + queue_array[0]);
@@ -135,6 +92,61 @@ setInterval(function() {
 
 }, 
 1000);
+
+
+async function listenFacebook(err, message) {
+  //checkThreadPlaylist(message.threadID);
+
+  
+  
+  // cmd.run(message.body);
+  var { body } = message;
+  // should maybe make it all lowercase so that auto capitalization doesn't break it
+  var body = body.toLowerCase();
+
+
+  if (body.indexOf('play song') > -1) { // has the word play
+    //const songToSearch = body.match(/play(.+)/)[1].trim();
+    const songToSearch = body.split("song ")[1];
+    console.log(`Song to search: ${songToSearch}`);
+    const searchResults = await spotifyApi.searchTracks(songToSearch);
+    const songToPlay = searchResults.body.tracks.items[0].uri;
+    console.log(`Song to play: ${songToPlay}`);
+    console.log(searchResults.body.tracks.items[0]);
+    cmd.run(`spotify play uri ${songToPlay}`);
+  } // api.sendMessage(message.body, message.threadID);
+
+  else if (body.indexOf('https://open.spotify.com/user') > -1 ) { // is a spotify playlist link
+
+    const playlistIdentifier = body.split("playlist/")[1]; // grabs the unique playlist identifier
+    console.log(`playing spotify:user:kabirvirji:playlist:${playlistIdentifier}`);
+    cmd.run(`spotify play uri spotify:user:kabirvirji:playlist:${playlistIdentifier}`);
+
+  }
+
+  else if (body.indexOf('queue') > -1) { // has the word queue
+
+    const songToSearchforQueue = body.split("queue ")[1]; // takes just the song name eg. "queue songname" will just take songname
+    const searchResultsforQueue = await spotifyApi.searchTracks(songToSearchforQueue); // search results like before
+    const songToQueue = searchResultsforQueue.body.tracks.items[0].uri; // index at URI instread of name like before
+    
+    //const songToQueue = searchResultsforQueue.body.tracks.items[0].uri;
+    queue_array.push(songToQueue);
+    console.log(queue_array);
+
+  }
+
+  else if (body.indexOf('next') > -1) { // plays the next song
+    cmd.run(`spotify next`);
+  }
+
+  else if (body.indexOf('pause') > -1) { // plays the next song
+    clearInterval(myInterval);
+    cmd.run(`spotify pause`);
+  }
+
+
+
 
   // cmd.get('spotify status') to get position of song ie) Position: 0:17 / 2:30 (check docs for the cmd function)
   // turn that into a percentage, or something to make sure the song is complete
