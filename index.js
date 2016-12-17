@@ -35,69 +35,12 @@ function prettyConsole(data) {
 //   prettyConsole(await spotifyApi.getUser(username));
 // }
 var queue_array = [];
-
-var myInterval = setInterval(function() {
-
-  cmd.get(
-    'spotify status',
-    function(data) {
-      console.log(data);
-      console.log(data.includes('paused')); // bool
-      if (data.includes('paused')) {
-        console.log(`The song is paused, so I'll play: ${queue_array}`);
-        cmd.run('spotify play uri ' + queue_array[0]);
-        queue_array.shift();
-        console.log(`After plaything queued song, the array looks like this: ${queue_array}`);
-      }
-      // var x = 5;
-      // var position = data.split("Position: ")[1];
-      // var position_two = data;
-      // console.log(position);
-      // now we have just: 3:46 / 3:46
-      // if (typeof position !== 'undefined') {
-      //   var positionArray = position.split(' / '); // positionArray or position is not defined ?????
-      //   // [ '3:46', '3:46' ] when song time is up
-      //   var time = positionArray[1]; // second element in array
-      //   var new_time_two = time.replace("\n", ""); // get rid of the newline character
-      //   var new_time_two_two = new_time_two.replace(":", "."); // convert the time 3:46 to 3.46
-      //   var time_zero = positionArray[0]; // first element in array
-      //   var new_time_one = time_zero.replace(":", "."); // convert to str float
-      //   var finalOne = Number(new_time_one);
-      //   var finalTwo = Number(new_time_two_two);
-      //   var finalOnetoCompare = finalOne + 0.01;
-      //   console.log(`Time of song: ${finalOne} ${finalTwo}`);
-      // }
-      // else if (typeof position_two !== 'undefined') { // spotify is paued, so play the next song
-      //   cmd.run('spotify play uri ' + queue_array[0]); // play the first song in the array
-      //   queue_array.shift(); // remove first element in array
-      // }
-
-      // *****
-      // looks like position is undefined when the song is paused. when the song is paused the shell looks like this:
-      // ~ spotify status
-      // Spotify is currently paused.
-      // wrote an else if to deal with if that is the response from 'spotify status'
-
-
-        // if ((finalOne+0.01) == finalTwo) {
-        //   //if (positionArray[0] == new_time) {
-        //     // if the two elements in the array match each other then the song is finished
-        //     cmd.run('spotify play uri ' + queue_array[0]); // play the first song in the array
-        //     queue_array.shift(); // remove first element in array
-        //   //}
-        // }
-      }
-  )
-
-
-}, 
-1000);
+var pausedFromMessage = true;
 
 
 async function listenFacebook(err, message) {
   //checkThreadPlaylist(message.threadID);
 
-  
   
   // cmd.run(message.body);
   var { body } = message;
@@ -136,19 +79,44 @@ async function listenFacebook(err, message) {
 
   }
 
-  else if (body.indexOf('next') > -1) { // plays the next song
-    cmd.run(`spotify next`);
-  }
-
   else if (body.indexOf('pause') > -1) { // plays the next song
+    pausedFromMessage = false;
     clearInterval(myInterval);
     cmd.run(`spotify pause`);
   }
 
   else if (body.indexOf('play') > -1) { // plays the next song
-    clearInterval(myInterval);
+
     cmd.run(`spotify play`);
   }
+
+  else if (body.indexOf('next') > -1) { // plays the next song
+    cmd.run(`spotify next`);
+  }
+
+
+
+var myInterval = setInterval(function() {
+
+  cmd.get(
+    'spotify status',
+    function(data) {
+      console.log(data);
+      console.log(data.includes('paused')); // bool
+      if (data.includes('paused') && pausedFromMessage) {
+        console.log(`The song is paused, so I'll play: ${queue_array}`);
+        cmd.run('spotify play uri ' + queue_array[0]);
+        queue_array.shift();
+        console.log(`After plaything queued song, the array looks like this: ${queue_array}`);
+      }
+    }
+  )
+
+
+}, 
+1000);
+
+
 
 
 
@@ -179,6 +147,7 @@ async function listenFacebook(err, message) {
     THEN PLAY NEXT SONG
 
   */
+
 
 }
 
