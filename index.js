@@ -2,6 +2,7 @@ const login = require('facebook-chat-api');
 const prettyjson = require('prettyjson');
 const config = require('./config.json');
 const cmd = require('node-cmd');
+// remember to brew install shoptify
 const SpotifyWebApi = require('spotify-web-api-node');
 const spotifyApi = new SpotifyWebApi({
   clientId : config.spotifyid,
