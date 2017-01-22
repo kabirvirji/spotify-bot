@@ -14,27 +14,6 @@ function prettyConsole(data) {
   console.log(prettyjson.render(data));
 }
 
-// Trying to get an intro message at beginning of conversation, or when it is added to a group
-
-// login({email: "", password: ""}, function callback (err, api) {
-//     if(err) return console.error(err);
-
-//     var yourID = "100014215535982";
-//     var msg = {body: "Hey!"};
-//     api.sendMessage(msg, yourID);
-//     console.log(msg);
-// });
-
-// For creating playlists for groups
-
-// async function checkThreadPlaylist(threadID) {
-//   const playlists = await spotifyApi.getUserPlaylists(config.spotifyUsername);
-//   prettyConsole(playlists);
-// }
-
-// async function getUser(username) {
-//   prettyConsole(await spotifyApi.getUser(username));
-// }
 var queue_array = [];
 var pausedFromMessage = true;
 
@@ -130,41 +109,6 @@ var myInterval = setInterval(function() {
 
 }, 
 1000);
-
-
-
-
-
-
-  // cmd.get('spotify status') to get position of song ie) Position: 0:17 / 2:30 (check docs for the cmd function)
-  // turn that into a percentage, or something to make sure the song is complete
-  // THEN play the next song in the array
-
-  // could also just get the time from spotify status and compare with the time from the search results (which is in ms, will need to convert)
-  // the following converts ms to minute:second format
-  // var ms = 171373,
-  //    min = (ms/1000/60) << 0,
-  //    sec = ((ms/1000) % 60).toFixed(0);
-
-
-  // alert(min + ':' + sec);
-  // the call to get ms of the song is searchResults.body.tracks.items[0].duration_ms;
-
-
-  /*
-
-  Have an if statement for song between one and three seconds where x is the difference in times
-  2.5 / 3.68
-  var x = 3.68 - 2.5
-   if (1 < x < 3)
-    STOP THE INTERVAL FUNCTION
-    WAIT x SECONDS
-    THEN PLAY NEXT SONG
-
-  */
-
-
-//}
 
 async function init() {
   await initSpotify();
