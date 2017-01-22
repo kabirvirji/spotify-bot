@@ -49,16 +49,30 @@ async function listenFacebook(err, message) {
   var body = body.toLowerCase();
 
 
-  if (body.indexOf('play song') > -1) { // has the word play
+
+
+  if (body.indexOf('play') > -1) { // has the word play
     //const songToSearch = body.match(/play(.+)/)[1].trim();
-    const songToSearch = body.split("song ")[1];
-    console.log(`Song to search: ${songToSearch}`);
+    const songToSearch = body.split("play ")[1];
+    //console.log(`Song to search: ${songToSearch}`);
     const searchResults = await spotifyApi.searchTracks(songToSearch);
-    const songToPlay = searchResults.body.tracks.items[0].uri;
-    console.log(`Song to play: ${songToPlay}`);
-    console.log(searchResults.body.tracks.items[0]);
-    cmd.run(`spotify play uri ${songToPlay}`);
-  } // api.sendMessage(message.body, message.threadID);
+    if (searchResults) {
+      const songToPlay = searchResults.body.tracks.items[0].uri;
+      //console.log(`Song to play: ${songToPlay}`);
+      //console.log(searchResults.body.tracks.items[0]);
+      cmd.run(`spotify play uri ${songToPlay}`);
+    }
+    else {
+login({email: config.login, password: config.password}, function callback (err, api) {
+    if(err) return console.error(err);
+
+    var yourID = 1626794548;
+    var msg = {body: "Sorry, that song doesn\'t exist"};
+    api.sendMessage(msg, yourID);
+});
+    }
+
+  }
 
   else if (body.indexOf('https://open.spotify.com/user') > -1 ) { // is a spotify playlist link
 
@@ -86,7 +100,7 @@ async function listenFacebook(err, message) {
     cmd.run(`spotify pause`);
   }
 
-  else if (body.indexOf('play') > -1) { // plays the next song
+  else if (body.indexOf('unpause') > -1) { // plays the next song
 
     cmd.run(`spotify play`);
   }
@@ -95,7 +109,7 @@ async function listenFacebook(err, message) {
     cmd.run(`spotify next`);
   }
 
-
+}
 
 var myInterval = setInterval(function() {
 
@@ -150,7 +164,7 @@ var myInterval = setInterval(function() {
   */
 
 
-}
+//}
 
 async function init() {
   await initSpotify();
@@ -172,5 +186,39 @@ function loginToFacebook() {
     })
   });
 }
+
+login({email: config.login, password: config.password}, function callback (err, api) {
+    if(err) return console.error(err);
+
+    var yourID = 1626794548;
+    var msg = {body: "Hey! My name is Spotify Bot and I'm here to help you control your music! To play a song tell me to \"play <songname>\". To queue a song (add it to up next) tell me to \"queue <songname>\". I can also handle playlist links! Have fun 🎵"};
+    api.sendMessage(msg, yourID);
+});
+
+login({email: config.login, password: config.password}, function callback (err, api) {
+    if(err) return console.error(err);
+
+    api.setOptions({listenEvents: true});
+
+    var stopListening = api.listen(function(err, event) {
+        if(err) return console.error(err);
+
+        switch(event.type) {
+          case "message":
+            if(event.body === '/stop') {
+              api.sendMessage("Goodbye...", event.threadID);
+              return stopListening();
+            }
+            api.markAsRead(event.threadID, function(err) {
+              if(err) console.log(err);
+            });
+            api.sendMessage("Sure, I'll " + event.body, event.threadID);
+            break;
+          case "event":
+            console.log(event);
+            break;
+        }
+    });
+});
 
 init();
