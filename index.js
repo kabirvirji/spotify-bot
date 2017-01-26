@@ -9,89 +9,91 @@ const spotifyApi = new SpotifyWebApi({
   clientSecret : config.spotifysecret
 });
 let api;
-
 function prettyConsole(data) {
   console.log(prettyjson.render(data));
 }
 
-var queue_array = [];
-var pausedFromMessage = true;
-
+var queue_array = []; // array that queued songs are appended too
+var pausedFromMessage = true; // variable so we're able to pause the music through messenger
 
 async function listenFacebook(err, message) {
-  //checkThreadPlaylist(message.threadID);
-
-  
-  // cmd.run(message.body);
   var { body } = message;
-  // should maybe make it all lowercase so that auto capitalization doesn't break it
-  var body = body.toLowerCase();
+  var body = body.toLowerCase(); // make everything lower case
 
-
-
-
+  /* 
+  User: "play <songname>"
+  Bot: Sure, I'll play <songname> || Bot: Wait.. something does not sound right. Please try something else.
+  */
   if (body.indexOf('play') > -1) { // has the word play
-    //const songToSearch = body.match(/play(.+)/)[1].trim();
     const songToSearch = body.split("play ")[1];
-    //console.log(`Song to search: ${songToSearch}`);
     const searchResults = await spotifyApi.searchTracks(songToSearch);
-    if (searchResults) {
+    if (searchResults.body.tracks.items[0] != null) {
       const songToPlay = searchResults.body.tracks.items[0].uri;
-      //console.log(`Song to play: ${songToPlay}`);
-      //console.log(searchResults.body.tracks.items[0]);
       cmd.run(`spotify play uri ${songToPlay}`);
     }
     else {
-login({email: config.login, password: config.password}, function callback (err, api) {
-    if(err) return console.error(err);
-
+      login({email: config.login, password: config.password}, function callback (err, api) {
+        if(err) {
+          return console.error(err);
+        }
     var yourID = 1626794548;
-    var msg = {body: "Sorry, that song doesn\'t exist"};
+    var msg = {body: "Wait.. something does not sound right. Please try something else"};
     api.sendMessage(msg, yourID);
-});
+      });
     }
-
   }
 
-  else if (body.indexOf('https://open.spotify.com/user') > -1 ) { // is a spotify playlist link
-
+  // needs rework
+  else if (body.indexOf('https://open.spotify.com/user') > -1 ) { // spotify playlist link
     const playlistIdentifier = body.split("playlist/")[1]; // grabs the unique playlist identifier
-    console.log(`playing spotify:user:kabirvirji:playlist:${playlistIdentifier}`);
-    cmd.run(`spotify play uri spotify:user:kabirvirji:playlist:${playlistIdentifier}`);
-
+    //console.log(`playing spotify:user:kabirvirji:playlist:${playlistIdentifier}`);
+    var user = config.username;
+    cmd.run(`spotify play uri spotify:user:${user}:playlist:${playlistIdentifier}`);
   }
 
   else if (body.indexOf('queue') > -1) { // has the word queue
-
     const songToSearchforQueue = body.split("queue ")[1]; // takes just the song name eg. "queue songname" will just take songname
     const searchResultsforQueue = await spotifyApi.searchTracks(songToSearchforQueue); // search results like before
     const songToQueue = searchResultsforQueue.body.tracks.items[0].uri; // index at URI instread of name like before
-    
-    //const songToQueue = searchResultsforQueue.body.tracks.items[0].uri;
-    queue_array.push(songToQueue);
-    console.log(queue_array);
-
+    if (searchResultsforQueue.body.tracks.items[0] != null) {
+        queue_array.push(songToQueue);
+        console.log(queue_array);
+    } else {
+      login({email: config.login, password: config.password}, function callback (err, api) {
+        if(err) {
+          return console.error(err);
+        }
+    var yourID = 1626794548;
+    var msg = {body: "Wait.. something does not sound right. Please try something else"};
+    api.sendMessage(msg, yourID);
+      });
+    }
   }
 
-  else if (body.indexOf('pause') > -1) { // plays the next song
+  // needs rework
+  else if (body.indexOf('pause') > -1) { 
     pausedFromMessage = false;
     clearInterval(myInterval);
     cmd.run(`spotify pause`);
   }
 
-  else if (body.indexOf('unpause') > -1) { // plays the next song
-
+  // needs rework
+  else if (body.indexOf('unpause') > -1) { 
     cmd.run(`spotify play`);
   }
 
-  else if (body.indexOf('next') > -1) { // plays the next song
+  // needs rework
+  else if (body.indexOf('next') > -1) { 
     cmd.run(`spotify next`);
   }
 
 }
 
+/* 
+Checks every second using the 'spotify status' command to see if the song is paused.
+If the song is paused, it means its over, and the next song in the array plays
+*/
 var myInterval = setInterval(function() {
-
   cmd.get(
     'spotify status',
     function(data) {
@@ -105,14 +107,11 @@ var myInterval = setInterval(function() {
       }
     }
   )
-
-
 }, 
 1000);
 
 async function init() {
   await initSpotify();
-  // await getUser(config.spotifyUsername);
   api = await loginToFacebook();
   api.listen(listenFacebook);
 }
@@ -133,7 +132,6 @@ function loginToFacebook() {
 
 login({email: config.login, password: config.password}, function callback (err, api) {
     if(err) return console.error(err);
-
     var yourID = 1626794548;
     var msg = {body: "Hey! My name is Spotify Bot and I'm here to help you control your music! To play a song tell me to \"play <songname>\". To queue a song (add it to up next) tell me to \"queue <songname>\". I can also handle playlist links! Have fun 🎵"};
     api.sendMessage(msg, yourID);
@@ -145,7 +143,8 @@ login({email: config.login, password: config.password}, function callback (err, 
     api.setOptions({listenEvents: true});
 
     var stopListening = api.listen(function(err, event) {
-        if(err) return console.error(err);
+        if(err) 
+          api.sendMessage("Sorry, that didn't quite work");
 
         switch(event.type) {
           case "message":
@@ -154,7 +153,11 @@ login({email: config.login, password: config.password}, function callback (err, 
               return stopListening();
             }
             api.markAsRead(event.threadID, function(err) {
-              if(err) console.log(err);
+              if(err) {
+                console.log(err)
+                api.sendMessage("Sorry, that didn't quite work");
+
+              }
             });
             api.sendMessage("Sure, I'll " + event.body, event.threadID);
             break;
