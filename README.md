@@ -7,7 +7,8 @@ Spotify Messenger Bot
 2. npm install
 3. install "shpotify"
 4. create config.json after generating Spotify API keys
-```{
+```
+{
   "login": "",
   "password":"",
   "spotifyid": "",
@@ -15,6 +16,7 @@ Spotify Messenger Bot
   "username": ""
 }
 ```
+
 5. npm start
 6. message the bot
 
