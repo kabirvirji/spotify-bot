@@ -24,7 +24,7 @@ async function listenFacebook(err, message) {
   User: "play <songname>"
   Bot: Sure, I'll play <songname> || Bot: Wait.. something does not sound right. Please try something else.
   */
-  if (body.indexOf('play') > -1) { // has the word play
+  if ((body.indexOf('play') > -1) && (body.indexOf('@spotify') > -1)) { // has the word play
     const songToSearch = body.split("play ")[1];
     const searchResults = await spotifyApi.searchTracks(songToSearch);
     if (searchResults.body.tracks.items[0] != null) {
@@ -51,7 +51,7 @@ async function listenFacebook(err, message) {
     cmd.run(`spotify play uri spotify:user:${user}:playlist:${playlistIdentifier}`);
   }
 
-  else if (body.indexOf('queue') > -1) { // has the word queue
+  else if (body.indexOf('queue') > -1 (body.indexOf('@spotify') > -1)) { // has the word queue
     const songToSearchforQueue = body.split("queue ")[1]; // takes just the song name eg. "queue songname" will just take songname
     const searchResultsforQueue = await spotifyApi.searchTracks(songToSearchforQueue); // search results like before
     const songToQueue = searchResultsforQueue.body.tracks.items[0].uri; // index at URI instread of name like before
@@ -159,7 +159,9 @@ login({email: config.login, password: config.password}, function callback (err, 
 
               }
             });
-            api.sendMessage("Sure, I'll " + event.body, event.threadID);
+            if(event.body.indexOf('@spotify') > -1 && ((event.body.indexOf('play') > -1) || event.body.indexOf('queue') > -1)){
+            api.sendMessage("Sure, I'll" + event.body.replace("@spotify", ""), event.threadID);
+          }
             break;
           case "event":
             console.log(event);
