@@ -2,7 +2,9 @@
 
 With this bot you'll be able to control Spotify through Facebook Messenger. <br><br>
 Although each bot is linked to a specific user, anyone can message the bot and it can be added to group chats. <br>
-This makes it great for parties and events because anyone can play a song! 
+This makes it great for parties and events because anyone can play a song! <br>
+
+## [Watch the Demo](https://www.youtube.com/watch?v=ALJ9VN21ecA)
 
 ## requirments
 
