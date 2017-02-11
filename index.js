@@ -168,6 +168,10 @@ login({email: config.login, password: config.password}, function callback (err, 
               // need to login again
               api.sendMessage("Unpaused", event.threadID);
             }
+            if(event.body == '@spotify next'){
+              // need to login again
+              api.sendMessage("Playing the next song!", event.threadID);
+            }
             break;
           case "event":
             console.log(event);
