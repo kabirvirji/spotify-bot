@@ -51,7 +51,7 @@ async function listenFacebook(err, message) {
     cmd.run(`spotify play uri spotify:user:${user}:playlist:${playlistIdentifier}`);
   }
 
-  else if (body.indexOf('queue') > -1 (body.indexOf('@spotify') > -1)) { // has the word queue
+  else if (body.indexOf('queue') > -1 && (body.indexOf('@spotify') > -1)) { // has the word queue
     const songToSearchforQueue = body.split("queue ")[1]; // takes just the song name eg. "queue songname" will just take songname
     const searchResultsforQueue = await spotifyApi.searchTracks(songToSearchforQueue); // search results like before
     const songToQueue = searchResultsforQueue.body.tracks.items[0].uri; // index at URI instread of name like before
@@ -70,19 +70,16 @@ async function listenFacebook(err, message) {
     }
   }
 
-  // needs rework
   else if (body.indexOf('pause') > -1) { 
     pausedFromMessage = false;
     clearInterval(myInterval);
     cmd.run(`spotify pause`);
   }
 
-  // needs rework
   else if (body.indexOf('unpause') > -1) { 
     cmd.run(`spotify play`);
   }
 
-  // needs rework
   else if (body.indexOf('next') > -1) { 
     cmd.run(`spotify next`);
   }
@@ -98,12 +95,12 @@ var myInterval = setInterval(function() {
     'spotify status',
     function(data) {
       console.log(data);
-      console.log(data.includes('paused')); // bool
+      //console.log(data.includes('paused')); // bool
       if (data.includes('paused') && pausedFromMessage) {
-        console.log(`The song is paused, so I'll play: ${queue_array}`);
+        //console.log(`The song is paused, so I'll play: ${queue_array}`);
         cmd.run('spotify play uri ' + queue_array[0]);
         queue_array.shift();
-        console.log(`After plaything queued song, the array looks like this: ${queue_array}`);
+        //console.log(`After plaything queued song, the array looks like this: ${queue_array}`);
       }
     }
   )
@@ -133,7 +130,7 @@ function loginToFacebook() {
 login({email: config.login, password: config.password}, function callback (err, api) {
     if(err) return console.error(err);
     var yourID = 1626794548;
-    var msg = {body: "Hey! My name is Spotify Bot and I'm here to help you control your music! To play a song tell me to \"play <songname>\". To queue a song (add it to up next) tell me to \"queue <songname>\". I can also handle playlist links! Have fun 🎵"};
+    var msg = {body: "Hey! My name is Spotify Bot and I'm here to help you control your music! To play a song tell me to \"play <songname>\". To queue a song (add it to up next) tell me to \"queue <songname>\". Have fun 🎵"};
     api.sendMessage(msg, yourID);
 });
 
@@ -162,6 +159,15 @@ login({email: config.login, password: config.password}, function callback (err, 
             if(event.body.indexOf('@spotify') > -1 && ((event.body.indexOf('play') > -1) || event.body.indexOf('queue') > -1)){
             api.sendMessage("Sure, I'll" + event.body.replace("@spotify", ""), event.threadID);
           }
+            if(event.body == '@spotify pause'){
+              console.log('paused');
+              // need to login again
+              api.sendMessage("Paused", event.threadID);
+            }
+            if(event.body.indexOf('@spotify unpause') > -1){
+              // need to login again
+              api.sendMessage("Unpaused", event.threadID);
+            }
             break;
           case "event":
             console.log(event);
